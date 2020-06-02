@@ -22,14 +22,17 @@ For this you have to send the following command to the bot.
 
 Examples:
 
-    `!battle 15.05.2020 15:00 3,4`
-    This battle would be schedules on the 15th of may 2020 at 15:00 CEST and would allow 3v3's and 4v4's.
-    
-    `!battle 4.7 20:30`
-    This battle would be schedules on the 4th of july in the year that command was posted at 20:30 CEST and would allow 2v2's, 3v3's, 4v4's, and 5v5's.
-    
-    `!battle 17:30 2`
-    This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
+> `!battle 15.05.2020 15:00 3,4`
+>
+This battle would be schedules on the 15th of may 2020 at 15:00 CEST and would allow 3v3's and 4v4's.
+
+> `!battle 4.7 20:30`
+>
+This battle would be schedules on the 4th of july in the year that command was posted at 20:30 CEST and would allow 2v2's, 3v3's, 4v4's, and 5v5's.
+
+> `!battle 17:30 2`
+>
+This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
     
 ### Participate in a battle
 If you decide to take part in a battle you have to react to the organizers invitation message with the designated emojis for the sizes of the matches.
@@ -55,10 +58,12 @@ The bot's matchmaking system follows 2 optimizations:
 - Maximize the amount of points that players can have
 
 Examples:
+
     1. 15 participants
         - Every player has given its approval for any type of battle (2v2, 3v3, 4v4, 5v5).
         -> one 3v3 and one 4v4 are scheduled
         -> 1 player misses out
+        
     2. 27 participants
         - 5 players approved 2v2 and 5v5
         - 10 players approved 4v4 and 5v5
