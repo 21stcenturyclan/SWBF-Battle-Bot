@@ -34,6 +34,9 @@ This battle would be schedules on the 4th of july in the year that command was p
 >
 This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
     
+![Organize](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite.PNG)
+![Overview](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/response.PNG)
+
 ### Participate in a battle
 If you decide to take part in a battle you have to react to the organizers invitation message with the designated emojis for the sizes of the matches.
 If the match only allows 2v2 it only matters if you react with the ':2v2:' emoji.
@@ -41,9 +44,14 @@ If the match only allows 2v2 it only matters if you react with the ':2v2:' emoji
 If the match allows all types of matches you only have to react with the emojis of the type of battle you would like to take part in.
 For example if you only want to play 4v4 or 5v5 you should only react with ':4v4:' and ':5v5:'.
 
+![Participate](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/player_reaction.PNG)
+
 ### Start a battle
 Only admins can start a battle.
 When an admin reacts with the designated emoji (:+1:) the bot will do the matchmaking for the players that joined the battle.
+
+![Start](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/admin_reaction.PNG)
+
 It is possible that no battle will happen if not enough players joined the invitation or the ones that joined have different preferences.
 For example, if only 7 players voted to have a 4v4 it is not possible to do 4v4.
 Also if 9 players voted to have a 3v3, 3 players miss out on the battle.
@@ -51,6 +59,8 @@ Therefore it is usually recommended to join all the available battle sizes.
 
 When the admin has given his approval the bot will create channels for each team of the battles and assign roles for each team members.
 In each team there is one 'commander' role that is responsible for taking screenshots of the results and reporting it back to the bot.
+
+![Matches](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/matches.PNG)
 
 #### Matchmaking
 The bot's matchmaking system follows 2 optimizations:

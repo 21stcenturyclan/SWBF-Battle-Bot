@@ -40,6 +40,15 @@ class BattleBot(commands.Cog):
         # Store battle with message id
         self._battles[msg.id] = battle
 
+    @commands.command(name='report',
+                      aliases=['battlereport'],
+                      help='bla')
+    async def report(self, ctx, battle_id=None):
+        log(Context.get_user_roles(ctx))
+        if 'Battle Commander' in Context.get_user_roles(ctx):
+            log(ctx.message.__repr__)
+            log(str(ctx.message))
+
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         # Is it a reaction to the battle invitation?
@@ -59,22 +68,26 @@ class BattleBot(commands.Cog):
 
             # Did an admin start the battle?
             elif reaction.emoji == BattleBot.EMOJI_OK:
-                if 'admin' in [role.name for role in user.roles]:
+                if 'admin' in Context.get_user_roles(user=user):
                     battle.start()
                     _id = 0
+                    categories = []
                     for message, embed in battle.get_match_messages():
                         await msg.channel.send(message, embed=embed)
                         _id += 1
-                        category = await msg.guild.create_category(name=str(_id - 1))
-                        await msg.guild.create_voice_channel(name=str(_id - 1) + '-team1', category=category)
-                        await msg.guild.create_text_channel(name=str(_id - 1) + '-team1', category=category)
-                        await msg.guild.create_voice_channel(name=str(_id - 1) + '-team2', category=category)
-                        await msg.guild.create_text_channel(name=str(_id - 1) + '-team2', category=category)
+                        n = 'Match ' + str(_id - 1)
+                        category = await msg.guild.create_category(name=n)
+                        categories.append(category)
+                        await msg.guild.create_voice_channel(name=n + '-team1', category=category)
+                        await msg.guild.create_text_channel(name=n + '-team1', category=category)
+                        await msg.guild.create_voice_channel(name=n + '-team2', category=category)
+                        await msg.guild.create_text_channel(name=n + '-team2', category=category)
 
                     for ch in msg.guild.channels:
                         if ch.name.lower().find('team1') >= 0 or ch.name.lower().find('team2') >= 0:
                             await ch.delete()
-                    await category.delete()
+                    for cat in categories:
+                        await cat.delete()
 
 
     @commands.Cog.listener()
