@@ -100,9 +100,11 @@ After this you can query your updated leaderboard stats.
 <div id="missing"></div>
 
 - It is not possible to leave a battle once a player joined
-- ...
+- Add mentions of the player names in the match descriptions.
+- Assign Commander roles randomly.
+- Add DB to store results.
 
 ## Improvements
 <div id="improvements"></div>
 
--
+- Let players add screenshots of the battle
