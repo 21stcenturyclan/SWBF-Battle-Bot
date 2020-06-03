@@ -22,19 +22,20 @@ For this you have to send the following command to the bot.
 
 Examples:
 
-> `!battle 15.05.2020 15:00 3,4`
->
-This battle would be schedules on the 15th of may 2020 at 15:00 CEST and would allow 3v3's and 4v4's.
+  > `!battle 15.05.2020 15:00 3,4`
 
-> `!battle 4.7 20:30`
->
-This battle would be schedules on the 4th of july in the year that command was posted at 20:30 CEST and would allow 2v2's, 3v3's, 4v4's, and 5v5's.
+  This battle would be schedules on the 15th of may 2020 at 15:00 CEST and would allow 3v3's and 4v4's.
 
-> `!battle 17:30 2`
->
-This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
+  > `!battle 4.7 20:30`
+
+  This battle would be schedules on the 4th of july in the year that command was posted at 20:30 CEST and would allow 2v2's, 3v3's, 4v4's, and 5v5's.
+
+  > `!battle 17:30 2`
+
+  This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
     
 ![Organize](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite.PNG)
+
 ![Overview](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/response.PNG)
 
 ### Participate in a battle
