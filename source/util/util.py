@@ -1,3 +1,4 @@
+import operator
 import os
 import sys
 from datetime import datetime
@@ -92,3 +93,7 @@ def number_of_factors(n: int, factors: list):
 def remove_from_list(l: Union[list, set], element):
     if element in l:
         l.remove(element)
+
+
+def get_max(d: dict):
+    return max(d.items(), key=operator.itemgetter(1))

@@ -1,11 +1,108 @@
-import random
-import operator
+from functools import reduce
+from hashlib import sha1
 from datetime import datetime
+from time import time
 
 import discord
 
 from source.util.text import *
-from source.util.util import remove_from_list, log
+from source.util.util import remove_from_list, log, get_max
+
+
+class Match:
+    def __init__(self, date, size):
+        self._id = time()
+        self._date = date
+        self._match_id = sha1(str(reversed(str(self._id))).encode('UTF-8')).hexdigest()[0:6]
+        self._size = size
+        self._players = []
+        self._roles = []
+        self._channels = []
+        self._team1 = []
+        self._team2 = []
+
+    #
+    # Private
+    #
+
+    def _get_random_teams(self):
+        team1, team2 = [], []
+        players = list(set(self._players))
+
+        for i, p in enumerate(players):
+            if i % 2 == 0:
+                team1.append(p)
+            else:
+                team2.append(p)
+
+        return team1, team2
+
+    #
+    # Public
+    #
+
+    def add_player(self, player):
+        self._players.append(player)
+
+    def get_players(self):
+        return self._players
+
+    def get_id(self):
+        return self._id
+
+    def get_match_id(self):
+        return self._match_id
+
+    def get_color(self):
+        return int(self._match_id, 16)
+
+    def player_names(self):
+        players = []
+        for player in self._players:
+            players.append(player.name)
+
+    def player_mentions(self):
+        players = []
+        for player in self._players:
+            players.append(player.mention)
+
+    def get_category_name(self):
+        return '{0}: {1}'.format(b(text(MATCH)), self.get_match_id())
+
+    def get_channel_name(self, team: int):
+        return '{0}-{1}'.format(self.get_match_id(), idfy(text(MATCH_TEAM1)) if team == 1 else idfy(text(MATCH_TEAM2)))
+
+    def set_channels(self, channels: list):
+        self._channels = channels
+
+    def get_role_name(self, team: int):
+        return '{0} {1}'.format(self.get_match_id(), text(MATCH_TEAM1) if team == 1 else text(MATCH_TEAM2))
+
+    def set_roles(self, roles: list):
+        self._roles = roles
+
+    def get_channels(self):
+        return self._channels
+
+    def get_match_message(self):
+        return b('{0} ({1}v{1}) - ID: {2}'.format(text(MATCH), self._size, self._match_id))
+
+    def get_match_embed(self):
+        embed = discord.Embed(title=b(text(MATCH)),
+                              description=text(BATTLE_START_MESSAGE),
+                              color=Battle.COLOR_START)
+
+        team1, team2 = self._get_random_teams()
+
+        embed.add_field(name=b(text(MATCH_TEAM1)),
+                        value='\n'.join(team1) or '-',
+                        inline=True)
+
+        embed.add_field(name=b(text(MATCH_TEAM2)),
+                        value='\n'.join(team2) or '-',
+                        inline=True)
+
+        return embed
 
 
 class Battle:
@@ -18,8 +115,7 @@ class Battle:
         self._date = date
         self._organizer = organizer
         self._sizes = []
-        self._players = set()
-        self._match_reactions = {4: [], 3: [], 5: [], 2: []}
+        self._reactions = {4: [], 3: [], 5: [], 2: []}
         self._matches = {4: [], 3: [], 5: [], 2: []}
 
         self._set_size(size)
@@ -44,59 +140,56 @@ class Battle:
             sizes.append('{0}v{0}'.format(s))
         return ', '.join(sizes)
 
-    def _do_matchmaking(self):
+    def _calculate_reaction_pool(self):
         # Number of players for every type of match
-        p = {4: len(self._match_reactions[4]),
-             3: len(self._match_reactions[3]),
-             5: len(self._match_reactions[5]),
-             2: len(self._match_reactions[2])}
+        reactions = {4: len(self._reactions[4]),
+                     3: len(self._reactions[3]),
+                     5: len(self._reactions[5]),
+                     2: len(self._reactions[2])}
 
         # Number of matches possible
-        m1 = {4: int(p[4] / 8),
-              3: int(p[3] / 6)}
-        m2 = {5: int(p[5] / 10),
-              2: int(p[2] / 4)}
+        primary_matches = {4: int(reactions[4] / 8),
+                           3: int(reactions[3] / 6)}
+        secondary_matches = {5: int(reactions[5] / 10),
+                             2: int(reactions[2] / 4)}
 
+        return primary_matches, secondary_matches
+
+    def _calculate_match_sizes(self, primary_matches, secondary_matches):
         # Look what type generates the biggest number of matches (4v4, 3v3)
-        optimal = max(m1.items(), key=operator.itemgetter(1))[0]
-        if m1[optimal] > 0:
-            for i in range(m1[optimal]):
-                match = set()
-                for j in range(optimal * 2):
-                    player = self._match_reactions[optimal][j]
-                    match.add(player)
-                self._matches[optimal].append(match)
-                for player in match:
-                    remove_from_list(self._match_reactions[4], player)
-                    remove_from_list(self._match_reactions[3], player)
-                    remove_from_list(self._match_reactions[5], player)
-                    remove_from_list(self._match_reactions[2], player)
+        match_size, number_of_matches = get_max(primary_matches)
 
-        # Look what type generates the biggest number of matches (5v5, 2v2)
-        optimal = max(m2.items(), key=operator.itemgetter(1))[0]
-        if m2[optimal] > 0:
-            for player in self._match_reactions[optimal]:
-                remove_from_list(self._match_reactions[4], player)
-                remove_from_list(self._match_reactions[3], player)
-                remove_from_list(self._match_reactions[5], player)
-                remove_from_list(self._match_reactions[2], player)
+        # If no 4v4 or 3v3 can take place, choose 5v5 or 2v2
+        if number_of_matches == 0:
+            match_size, number_of_matches = get_max(secondary_matches)
 
-        log(m1)
-        log(m2)
-        log(self._match_reactions)
-        log(self._matches)
+        return match_size, number_of_matches
 
-    def _get_random_teams(self, players):
-        team1, team2 = [], []
-        players = list(set(players))
+    def _remove_players_from_reaction_pool(self, players):
+        for player in players:
+            remove_from_list(self._reactions[4], player)
+            remove_from_list(self._reactions[3], player)
+            remove_from_list(self._reactions[5], player)
+            remove_from_list(self._reactions[2], player)
 
-        for i, p in enumerate(players):
-            if i % 2 == 0:
-                team1.append(p)
-            else:
-                team2.append(p)
+    def _do_matchmaking(self):
+        primary_matches, secondary_matches = self._calculate_reaction_pool()
+        match_size, number_of_matches = self._calculate_match_sizes(primary_matches, secondary_matches)
 
-        return team1, team2
+        while number_of_matches > 0:
+
+            for i in range(number_of_matches):
+                match = Match(self._date, match_size)
+
+                for j in range(match_size * 2):
+                    player = self._reactions[match_size][j]
+                    match.add_player(player)
+
+                self._matches[match_size].append(match)
+                self._remove_players_from_reaction_pool(match.get_players())
+
+            primary_matches, secondary_matches = self._calculate_reaction_pool()
+            match_size, number_of_matches = self._calculate_match_sizes(primary_matches, secondary_matches)
 
     #
     # Public
@@ -111,24 +204,22 @@ class Battle:
     def get_embed_playerlist(self):
         embed = self._invite_msg_object.embeds[0]
         embed.set_field_at(3,
-                           name=b(text(PLAYERS)) + '({0})'.format(len(self._players)),
+                           name=b(text(PLAYERS)) + '({0})'.format(self.player_count()),
                            value=self.get_playerlist(),
                            inline=False)
         return embed
 
     def player_count(self):
-        return len(self._players)
+        return reduce(lambda count, l: count + len(l), self._reactions.values(), 0)
 
     def add_player(self, player, size):
-        self._players.add(player)
-        self._match_reactions[size].append(player)
+        self._reactions[size].append(player)
 
     def get_playerlist(self):
-        return ', '.join(self._players)
+        return '\n'.join(['{0}v{0}: {1}'.format(b(k), ', '.join(v)) for k, v in self._reactions.items()])
 
-    def remove_player(self, player):
-        if player in self._players:
-            self._players.remove(player)
+    def get_matches(self):
+        return self._matches
 
     def start(self):
         self._do_matchmaking()
@@ -156,51 +247,5 @@ class Battle:
         embed.add_field(name=b(text(PLAYERS)),
                         value=text(EMPTY),
                         inline=False)
-
-        return embed
-
-    def get_match_messages(self):
-        messages = []
-
-        for size in self._matches:
-            for match in self._matches[size]:
-                embed = discord.Embed(title=b(text(BATTLE)),
-                                      description=text(BATTLE_START_MESSAGE),
-                                      color=Battle.COLOR_START)
-
-                team1, team2 = self._get_random_teams(match)
-
-                embed.add_field(name=b(text(BATTLE_TEAM1)),
-                                value='\n'.join(team1) or '-',
-                                inline=True)
-
-                embed.add_field(name=b(text(BATTLE_TEAM2)),
-                                value='\n'.join(team2) or '-',
-                                inline=True)
-                messages.append([b('{0}v{0}'.format(size)), embed])
-
-        return messages
-
-    def get_start_message(self):
-        return b(text(BATTLE))
-
-    def get_start_embed(self):
-        embed = discord.Embed(title=b(text(BATTLE)),
-                              description=text(BATTLE_START_MESSAGE),
-                              color=Battle.COLOR_START)
-
-        team1, team2 = self._get_random_teams(self._matches[4][0])
-
-        embed.add_field(name='**4v4**:',
-                        value='\n'.join(self._matches[4][0]) or '-',
-                        inline=False)
-
-        embed.add_field(name=b(text(BATTLE_TEAM1)),
-                        value='\n'.join(team1) or '-',
-                        inline=True)
-
-        embed.add_field(name=b(text(BATTLE_TEAM2)),
-                        value='\n'.join(team2) or '-',
-                        inline=True)
 
         return embed

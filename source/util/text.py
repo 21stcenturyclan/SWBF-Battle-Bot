@@ -1,3 +1,5 @@
+import re
+
 ID = 0
 
 
@@ -20,9 +22,11 @@ EMPTY = text_id()
 DATE = text_id()
 ORGANIZER = text_id()
 PLAYERS = text_id()
+MATCH = text_id()
+MATCH_COMMANDER = text_id()
 BATTLE = text_id()
-BATTLE_TEAM1 = text_id()
-BATTLE_TEAM2 = text_id()
+MATCH_TEAM1 = text_id()
+MATCH_TEAM2 = text_id()
 BATTLE_2v2 = text_id()
 BATTLE_3v3 = text_id()
 BATTLE_4v4 = text_id()
@@ -64,9 +68,11 @@ TEXTS = {
     BOT_HELP_CLEAR_FUNWARS:  'Removes all funwars. [Admin command] (Only available in the server chat)',
     EMPTY:                   '\u200b',
     PLAYERS:                 'Players',
+    MATCH:                   'Match',
+    MATCH_COMMANDER:         'Match Commander',
     BATTLE:                  'Battle',
-    BATTLE_TEAM1:            'Team 1',
-    BATTLE_TEAM2:            'Team 2',
+    MATCH_TEAM1:             'Team 1',
+    MATCH_TEAM2:             'Team 2',
     BATTLE_2v2:              '2v2',
     BATTLE_3v3:              '3v3',
     BATTLE_4v4:              '4v4',
@@ -110,6 +116,10 @@ TEXTS = {
 
 def text(text_id):
     return TEXTS[text_id]
+
+
+def idfy(t):
+    return re.sub('\s', '-', t)
 
 
 def b(t):

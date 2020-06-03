@@ -1,5 +1,6 @@
 import random
 
+import discord
 from discord.ext import commands
 
 from source.battle import Battle
@@ -14,12 +15,15 @@ class BattleBot(commands.Cog):
     EMOJI_3 = '3v3'
     EMOJI_4 = '4v4'
     EMOJI_5 = '5v5'
+    BATTLE_ADMIN = 'admin'
+    BATTLE_COMMANDER = 'Battle Commander'
 
     BATTLE_EMOJI = {EMOJI_2: 2, EMOJI_3: 3, EMOJI_4: 4, EMOJI_5: 5}
 
     def __init__(self, bot):
         self._bot = bot
-        self._battles = {}
+        self._battle_invites = {}
+        self._battle_reports = {}
 
         bot.add_cog(self)
 
@@ -38,22 +42,22 @@ class BattleBot(commands.Cog):
         battle.set_invite_message_object(msg)
 
         # Store battle with message id
-        self._battles[msg.id] = battle
+        self._battle_invites[msg.id] = battle
 
     @commands.command(name='report',
                       aliases=['battlereport'],
                       help='bla')
     async def report(self, ctx, battle_id=None):
         log(Context.get_user_roles(ctx))
-        if 'Battle Commander' in Context.get_user_roles(ctx):
+        if BattleBot.BATTLE_ADMIN in Context.get_user_roles(ctx):
             log(ctx.message.__repr__)
             log(str(ctx.message))
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         # Is it a reaction to the battle invitation?
-        if reaction.message.id in self._battles:
-            battle = self._battles[reaction.message.id]
+        if reaction.message.id in self._battle_invites:
+            battle = self._battle_invites[reaction.message.id]
             msg = battle.get_invite_message_object()
 
             emoji = Context.get_emoji_name(reaction)
@@ -61,34 +65,39 @@ class BattleBot(commands.Cog):
 
             # Did someone join the battle?
             if emoji in BattleBot.BATTLE_EMOJI:
-                for i in range(random.randint(13, 14)):
-                    battle.add_player(name + str(i), BattleBot.BATTLE_EMOJI[emoji])
+                for i in range(random.randint(13, 36)):
+                    battle.add_player(name + str(i), random.choice(list(BattleBot.BATTLE_EMOJI.values())))
 
                 await msg.edit(embed=battle.get_embed_playerlist())
 
             # Did an admin start the battle?
             elif reaction.emoji == BattleBot.EMOJI_OK:
-                if 'admin' in Context.get_user_roles(user=user):
+                if BattleBot.BATTLE_ADMIN in Context.get_user_roles(user=user):
                     battle.start()
-                    _id = 0
-                    categories = []
-                    for message, embed in battle.get_match_messages():
-                        await msg.channel.send(message, embed=embed)
-                        _id += 1
-                        n = 'Match ' + str(_id - 1)
-                        category = await msg.guild.create_category(name=n)
-                        categories.append(category)
-                        await msg.guild.create_voice_channel(name=n + '-team1', category=category)
-                        await msg.guild.create_text_channel(name=n + '-team1', category=category)
-                        await msg.guild.create_voice_channel(name=n + '-team2', category=category)
-                        await msg.guild.create_text_channel(name=n + '-team2', category=category)
 
-                    for ch in msg.guild.channels:
-                        if ch.name.lower().find('team1') >= 0 or ch.name.lower().find('team2') >= 0:
-                            await ch.delete()
-                    for cat in categories:
-                        await cat.delete()
+                    for _, matches in battle.get_matches().items():
+                        for match in matches:
 
+                            color = discord.Colour(match.get_color())
+                            commander = discord.Colour(0xcccc00)
+
+                            await msg.channel.send(match.get_match_message(), embed=match.get_match_embed())
+                            r1 = await msg.guild.create_role(name=match.get_role_name(1), color=color)
+                            r2 = await msg.guild.create_role(name=match.get_role_name(2), color=color)
+                            com = await msg.guild.create_role(name=text(MATCH_COMMANDER), color=commander)
+                            cat = await msg.guild.create_category(name=match.get_category_name())
+                            v1 = await msg.guild.create_voice_channel(name=match.get_channel_name(1), category=cat)
+                            t1 = await msg.guild.create_text_channel(name=match.get_channel_name(1), category=cat)
+                            v2 = await msg.guild.create_voice_channel(name=match.get_channel_name(2), category=cat)
+                            t2 = await msg.guild.create_text_channel(name=match.get_channel_name(2), category=cat)
+
+                            match.set_channels([cat, v1, t1, v2, t2])
+                            match.set_roles([r1, r2, com])
+
+                    for _, matches in battle.get_matches().items():
+                        for match in matches:
+                            for channel in match.get_channels():
+                                await channel.delete()
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
