@@ -23,8 +23,12 @@ DATE = text_id()
 ORGANIZER = text_id()
 PLAYERS = text_id()
 MATCH = text_id()
+MATCH_START = text_id()
+MATCH_RESULT = text_id()
 MATCH_COMMANDER = text_id()
 BATTLE = text_id()
+BATTLE_INVITATION = text_id()
+BATTLE_COMMANDER = text_id()
 MATCH_TEAM1 = text_id()
 MATCH_TEAM2 = text_id()
 BATTLE_2v2 = text_id()
@@ -47,7 +51,8 @@ LEAVE_FUNWAR = text_id()
 FUNWAR_TEAMS = text_id()
 DATE_FORMAT_EU = text_id()
 BATTLE_REACTION_REQUEST = text_id()
-BATTLE_START_MESSAGE = text_id()
+MATCH_START_MESSAGE = text_id()
+MATCH_RESULT_MESSAGE = text_id()
 
 TEXTS = {
     BOT_HELP_STATS:          str('Shows stats. (Available in the private chat)\n'
@@ -69,8 +74,12 @@ TEXTS = {
     EMPTY:                   '\u200b',
     PLAYERS:                 'Players',
     MATCH:                   'Match',
+    MATCH_START:             'Match Start',
+    MATCH_RESULT:            'Match Result',
     MATCH_COMMANDER:         'Match Commander',
     BATTLE:                  'Battle',
+    BATTLE_INVITATION:       'Battle Invitation',
+    BATTLE_COMMANDER:        'Battle Commander',
     MATCH_TEAM1:             'Team 1',
     MATCH_TEAM2:             'Team 2',
     BATTLE_2v2:              '2v2',
@@ -109,8 +118,10 @@ TEXTS = {
                                  '**Team 1**:\n{0}\n\n'
                                  '**Team 2**:\n{1}'),
     BATTLE_REACTION_REQUEST: 'Please react with the team size emoji(s).',
-    BATTLE_START_MESSAGE:    str('Let the battle begin!\n'
-                                 'Here are the teams.\n')
+    MATCH_START_MESSAGE:     str('Let the battle begin!\n'
+                                 'Here are the teams.\n'),
+    MATCH_RESULT_MESSAGE:    str('Here are the results!\n'
+                                 'Please react with the designated emoji.\n')
 }
 
 

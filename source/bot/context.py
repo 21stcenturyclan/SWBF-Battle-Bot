@@ -16,9 +16,9 @@ class Context:
     @staticmethod
     def get_nick_or_name(ctx=None, user=None):
         if ctx:
-            return Context.get_username(ctx) or Context.get_nickname(ctx)
+            return Context.get_nickname(ctx) or Context.get_username(ctx)
         elif user:
-            return Context.get_username(user=user) or Context.get_nickname(user=user)
+            return Context.get_nickname(user=user) or Context.get_username(user=user)
 
     @staticmethod
     def get_user_roles(ctx=None, user=None):
