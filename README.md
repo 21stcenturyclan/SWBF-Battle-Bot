@@ -10,10 +10,24 @@
 - [Missing/TODO](#missing)
 - [Improvements](#improvements)
 
+### TLDR;
+The SWBF battle bot is a discord bot that is able to organize matches for Star Wars Battlefront (2004)
+It does matchmaking for different game sizes (2v2, 3v3, 4v4, 5v5) from user reaction to an invitation message.
+
 ## Introduction 
 <div id="introduction"></div>
 
 This bot should help to organize battles for the [swbfgamers.com](http://www.swbfgamers.com/) leaderboard.
+
+### Roles & Responsibilities
+
+| Role | Responsibilities |
+| --- | --- |
+| Everybody | Participate in battles |
+| Participants | React to battle invitations / Approve match results |
+| Battle Commanders | Approve battle invitations / Approve match results |
+| Match Commanders | Upload match result / Approve match results |
+| Admin | Approve battle invitations / Approve match results |
 
 ## HowTo
 <div id="howto"></div>
@@ -25,19 +39,19 @@ For this you have to send the following command to the bot.
 
 > `!battle <date> <time> <sizes>`
 
-Examples:
+#### Examples:
 
-  > `!battle 15.05.2020 15:00 3,4`
+> `!battle 15.05.2020 15:00 3,4`
 
-  This battle would be schedules on the 15th of may 2020 at 15:00 CEST and would allow 3v3's and 4v4's.
+This battle would be schedules on the 15th of may 2020 at 15:00 CEST and would allow 3v3's and 4v4's.
 
-  > `!battle 4.7 20:30`
+> `!battle 4.7 20:30`
 
-  This battle would be schedules on the 4th of july in the year that command was posted at 20:30 CEST and would allow 2v2's, 3v3's, 4v4's, and 5v5's.
+This battle would be schedules on the 4th of july in the year that command was posted at 20:30 CEST and would allow 2v2's, 3v3's, 4v4's, and 5v5's.
 
-  > `!battle 17:30 2`
+> `!battle 17:30 2`
 
-  This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
+This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
     
 ![Organize](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/organize.png)
 
@@ -123,10 +137,9 @@ When this is done the result is stored in in the database and the bot will respo
 ## Missing / TODO
 <div id="missing"></div>
 
-- It is not possible to leave a battle once a player joined
-- Add mentions of the player names in the match descriptions.
-- Assign Commander roles randomly.
+- It is not possible to leave a battle once a player joined.
 - Add DB to store results.
+- Add time constraint to matches/battle
 
 ## Improvements
 <div id="improvements"></div>
