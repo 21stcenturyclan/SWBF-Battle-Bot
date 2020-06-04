@@ -39,9 +39,9 @@ Examples:
 
   This battle would be schedules on the day that command was posted at 17:30 CEST and would allow 2v2's.
     
-![Organize](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/organize.PNG)
+![Organize](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/organize.png)
 
-![Invite](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite.PNG)
+![Invite](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite.png)
 
 ### Participate in a battle
 <div id="participate"></div>
@@ -51,14 +51,14 @@ If the match only allows 2v2 it only matters if you react with the ':2v2:' emoji
 If the match allows all types of matches you only have to react with the emojis of the type of battle you would like to take part in.
 For example if you only want to play 4v4 or 5v5 you should only react with ':4v4:' and ':5v5:'.
 
-![Participate](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite_reaction.PNG)
+![Participate](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite_reaction.png)
 
 ### Start a battle
 <div id="start"></div>
 Only admins can start a battle.
 When an admin reacts with the designated emoji (:+1:) the bot will do the matchmaking for the players that joined the battle.
 
-![Approval](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite_approval.PNG)
+![Approval](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/invite_approval.png)
 
 It is possible that no battle will happen if not enough players joined the invitation or the ones that joined have different preferences.
 For example, if only 7 players voted to have a 4v4 it is not possible to do 4v4.
@@ -68,11 +68,11 @@ Therefore it is usually recommended to join all the available battle sizes.
 When the admin has given his approval the bot will create channels for each team of the battles and assign roles for each team members.
 In each team there is one 'commander' role that is responsible for taking screenshots of the results and reporting it back to the bot.
 
-![Start](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/start.PNG)
+![Start](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/start.png)
 
-![Channels](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/channels.PNG)
+![Channels](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/channels.png)
 
-![Roles](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/roles.PNG)
+![Roles](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/roles.png)
 
 #### Matchmaking
 The bot's matchmaking system follows 2 optimizations:
@@ -103,20 +103,20 @@ Examples:
 After a battle is complete one of the team's commander has to report the results to the bot.
 For this the responsible person has to create a text file that contains the result of each skirmish.
 
-![Textfile](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/report_text.PNG)
+![Textfile](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/report_text.png)
 
 He then has to upload it to the discord server.
 
-![Drag&Drop](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/drag_drop.PNG)
+![Drag&Drop](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/drag_drop.png)
 
-![Upload](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/upload.PNG)
+![Upload](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/upload.png)
 
 If screenshots and stats are correct either both commanders, 50% of each teams members, or an admin have to approve the result with a ':+1:' reaction.
 When this is done the result is stored in in the database and the bot will respond with a message when it is done.
 
-![Result](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/result_bot.PNG)
+![Result](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/result_bot.png)
 
-![Result Approval](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/result_approval.PNG)
+![Result Approval](https://github.com/21stcenturyclan/SWBF-Battle-Bot/blob/master/readme/result_approval.png)
 
 <s>After this you can query your updated leaderboard stats.</s>
 
