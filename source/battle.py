@@ -1,4 +1,4 @@
-from functools import reduce
+import random
 from hashlib import sha1
 from datetime import datetime
 from time import time
@@ -46,11 +46,10 @@ class Match:
     # Public
     #
 
-    def add_player(self, player):
-        self._players.append(player)
-
-    def get_players(self):
-        return self._players
+    def start(self):
+        self._team1, self._team2 = self._get_random_teams()
+        self._commander1 = random.choice(self._team1)
+        self._commander2 = random.choice(self._team2)
 
     def get_id(self):
         return self._id
@@ -61,10 +60,28 @@ class Match:
     def get_color(self):
         return int(self._match_id, 16)
 
-    def player_names(self):
+    def add_player(self, player):
+        self._players.append(player)
+
+    def get_players(self):
+        return self._players
+
+    def get_player_count(self):
+        return len(self._players)
+
+    def get_player_names(self, collection: list = None):
+        collection = collection if collection else self._players
         players = []
-        for player in self._players:
+        for player in collection:
             players.append(player.name)
+        return players
+
+    def get_player_mentions(self, collection: list = None):
+        collection = collection if collection else self._players
+        players = []
+        for player in collection:
+            players.append(player.mention)
+        return players
 
     def get_commander(self, team):
         return self._commander1 if team == 1 else self._commander2
@@ -93,11 +110,6 @@ class Match:
         except:
             # Formatting error
             pass
-
-    def player_mentions(self):
-        players = []
-        for player in self._players:
-            players.append(player.mention)
 
     def get_category_name(self):
         return '{0}: {1}'.format(text(MATCH), self.get_match_id())
@@ -131,14 +143,12 @@ class Match:
                               description=text(MATCH_START_MESSAGE),
                               color=Battle.COLOR_START)
 
-        team1, team2 = self._get_random_teams()
-
         embed.add_field(name=b(text(MATCH_TEAM1)),
-                        value='\n'.join(team1) or '-',
+                        value='\n'.join(self.get_player_mentions(self.get_team(1))) or '-',
                         inline=True)
 
         embed.add_field(name=b(text(MATCH_TEAM2)),
-                        value='\n'.join(team2) or '-',
+                        value='\n'.join(self.get_player_mentions(self.get_team(2))) or '-',
                         inline=True)
 
         return embed
@@ -169,7 +179,8 @@ class Battle:
         self._date = date
         self._organizer = organizer
         self._sizes = []
-        self._reactions = {4: [], 3: [], 5: [], 2: []}
+        self._players = set()
+        self._reactions = {4: set(), 3: set(), 5: set(), 2: set()}
         self._matches = {4: {}, 3: {}, 5: {}, 2: {}}
 
         self._set_size(size)
@@ -236,7 +247,7 @@ class Battle:
                 match = Match(self._date, match_size)
 
                 for j in range(match_size * 2):
-                    player = self._reactions[match_size][j]
+                    player = self._reactions[match_size].pop()
                     match.add_player(player)
 
                 self._matches[match_size][match.get_match_id()] = match
@@ -259,18 +270,23 @@ class Battle:
         embed = self._invite_msg_object.embeds[0]
         embed.set_field_at(3,
                            name=b(text(PLAYERS)) + '({0})'.format(self.player_count()),
-                           value=self.get_playerlist(),
+                           value=self.get_participant_list(),
                            inline=False)
         return embed
 
     def player_count(self):
-        return reduce(lambda count, l: count + len(l), self._reactions.values(), 0)
+        return len(self._players)
 
     def add_player(self, player, size):
-        self._reactions[size].append(player)
+        self._players.add(player)
+        self._reactions[size].add(player)
 
-    def get_playerlist(self):
-        return '\n'.join(['{0}v{0}: {1}'.format(b(k), ', '.join(v)) for k, v in self._reactions.items()])
+    def get_participant_list(self):
+        playerlist = ''
+        for size, players in self._reactions.items():
+            playerlist += '{0}v{0}: {1}\n'.format(b(size), ', '.join([Context.get_nick_or_name(user=p) for p in players]))
+
+        return playerlist
 
     def get_matches(self):
         return self._matches

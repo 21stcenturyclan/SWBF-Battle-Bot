@@ -71,15 +71,11 @@ class BattleBot(commands.Cog):
         if reaction.message.id in self._battle_invites:
             battle = self._battle_invites[reaction.message.id]
             msg = battle.get_invite_message_object()
-
             emoji = Context.get_emoji_name(reaction)
-            name = Context.get_nick_or_name(user=user)
 
             # Did someone join the battle?
             if emoji in BattleBot.BATTLE_EMOJI:
-                for i in range(random.randint(14, 18)):
-                    battle.add_player(name + str(i), random.choice(list(BattleBot.BATTLE_EMOJI.values())))
-
+                battle.add_player(user, BattleBot.BATTLE_EMOJI[emoji])
                 await msg.edit(embed=battle.get_embed_playerlist())
 
             # Did an admin start the battle?
@@ -90,6 +86,7 @@ class BattleBot(commands.Cog):
                     for _, matches in battle.get_matches().items():
                         for _, match in matches.items():
 
+                            match.start()
                             await msg.channel.send(match.get_start_message(), embed=match.get_start_embed())
 
                             # Roles
@@ -100,13 +97,13 @@ class BattleBot(commands.Cog):
                             com1 = await msg.guild.create_role(name=match.get_commander_role_name(1), color=com_color)
                             com2 = await msg.guild.create_role(name=match.get_commander_role_name(2), color=com_color)
 
-                            # await match.get_commander(1).set_role(com1)
-                            # for player in match.get_team(1):
-                            #     await player.set_role(r1)
-                            #
-                            # await match.get_commander(2).set_role(com2)
-                            # for player in match.get_team(2):
-                            #     await player.set_role(r2)
+                            await match.get_commander(1).add_roles(com1)
+                            for player in match.get_team(1):
+                                await player.add_roles(r1)
+
+                            await match.get_commander(2).add_roles(com2)
+                            for player in match.get_team(2):
+                                await player.add_roles(r2)
 
                             # Channels
                             cat = await msg.guild.create_category(name=match.get_category_name())
@@ -115,7 +112,17 @@ class BattleBot(commands.Cog):
                             v2 = await msg.guild.create_voice_channel(name=match.get_channel_name(2), category=cat)
                             t2 = await msg.guild.create_text_channel(name=match.get_channel_name(2), category=cat)
 
-                            match.set_channels([v1, t1, v2, t2, cat])
+                            channels = [v1, t1, v2, t2, cat]
+                            permission = {
+                                msg.guild.default_role: discord.PermissionOverwrite(read_messages=True),
+                                r1: discord.PermissionOverwrite(read_messages=True),
+                                r2: discord.PermissionOverwrite(read_messages=True)
+                            }
+
+                            for channel in channels:
+                                await channel.set_permissions(overwrite=permission)
+
+                            match.set_channels(channels)
                             match.set_roles([r1, r2, com1, com2])
 
         # Is it a reaction to the match result?
