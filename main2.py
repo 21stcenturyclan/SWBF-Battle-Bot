@@ -1,6 +1,4 @@
 import signal
-import threading
-import time
 
 from discord.ext import commands
 from source.bot.battle import BattleBot
@@ -19,13 +17,4 @@ if __name__ == '__main__':
         exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
-
-    t = threading.Thread(target=bot.run, args=[KEY_DISCORD], daemon=True)
-    t.start()
-
-    while True:
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            exit(0)
-            break
+    bot.run(KEY_DISCORD)

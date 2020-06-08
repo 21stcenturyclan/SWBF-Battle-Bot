@@ -165,10 +165,6 @@ class BattleBot(commands.Cog):
                     log('  - admin confirmation')
                     battle.start()
 
-                    from source.battle import Match
-                    m = Match('20.05 12:00', 4)
-                    battle._matches[4]['123456'] = m
-
                     for _, matches in battle.get_matches().items():
                         for _, match in matches.items():
                             log('  - start match')
