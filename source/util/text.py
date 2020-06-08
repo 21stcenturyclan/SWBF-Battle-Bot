@@ -20,6 +20,7 @@ BOT_HELP_CLEAR_FUNWARS = text_id()
 ERROR = text_id()
 EMPTY = text_id()
 DATE = text_id()
+LOBBY = text_id()
 ORGANIZER = text_id()
 PLAYERS = text_id()
 MATCH = text_id()
@@ -73,6 +74,7 @@ TEXTS = {
     BOT_HELP_CLEAR_FUNWARS:  'Removes all funwars. [Admin command] (Only available in the server chat)',
     EMPTY:                   '\u200b',
     PLAYERS:                 'Players',
+    LOBBY:                   'Lobby',
     MATCH:                   'Match',
     MATCH_START:             'Match Start',
     MATCH_RESULT:            'Match Result',

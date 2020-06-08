@@ -17,7 +17,7 @@ class Match:
         self._match_id = sha1(str(reversed(str(self._id))).encode('UTF-8')).hexdigest()[0:6]
         self._size = size
         self._players = []
-        self._roles = []
+        self._role = None
         self._channels = []
         self._results = []
         self._approvals = []
@@ -47,9 +47,12 @@ class Match:
     #
 
     def start(self):
-        self._team1, self._team2 = self._get_random_teams()
-        self._commander1 = random.choice(self._team1)
-        self._commander2 = random.choice(self._team2)
+        try:
+            self._team1, self._team2 = self._get_random_teams()
+            self._commander1 = random.choice(self._team1)
+            self._commander2 = random.choice(self._team2)
+        except Exception:
+            pass
 
     def get_id(self):
         return self._id
@@ -115,7 +118,14 @@ class Match:
         return '{0}: {1}'.format(text(MATCH), self.get_match_id())
 
     def get_channel_name(self, team: int):
-        return '{0}-{1}'.format(self.get_match_id(), idfy(text(MATCH_TEAM1)) if team == 1 else idfy(text(MATCH_TEAM2)))
+        if team == 1:
+            postfix = idfy(text(MATCH_TEAM1))
+        elif team == 2:
+            postfix = idfy(text(MATCH_TEAM2))
+        else:
+            postfix = ''
+
+        return '{0}-{1}'.format(self.get_match_id(), postfix)
 
     def set_channels(self, channels: list):
         self._channels = channels
@@ -124,16 +134,20 @@ class Match:
         return self._channels
 
     def get_role_name(self, team: int):
-        return '{0} {1}'.format(self.get_match_id(), text(MATCH_TEAM1) if team == 1 else text(MATCH_TEAM2))
+        if team == 1:
+            postfix = text(MATCH_TEAM1)
+        elif team == 2:
+            postfix = text(MATCH_TEAM2)
+        else:
+            postfix = ''
 
-    def get_commander_role_name(self, team: int):
-        return '{0} {1} {2}'.format(self.get_match_id(), text(MATCH_COMMANDER), team)
+        return '{0} {1}'.format(self.get_match_id(), postfix)
 
-    def set_roles(self, roles: list):
-        self._roles = roles
+    def set_role(self, role):
+        self._role = role
 
-    def get_roles(self):
-        return self._roles
+    def get_role(self):
+        return self._role
 
     def get_start_message(self):
         return b('{0} ({1}v{1}) - ID: {2}'.format(text(MATCH_START), self._size, self._match_id))

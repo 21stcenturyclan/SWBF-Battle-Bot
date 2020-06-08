@@ -1,3 +1,4 @@
+import json
 import operator
 import os
 import sys
@@ -5,11 +6,11 @@ from datetime import datetime
 from typing import Union
 
 
-def get_key(name):
+def get_key(name: str):
     os.getenv(name)
 
 
-def get_keys_from_ini_file(file, sep='='):
+def get_keys_from_ini_file(file: str, sep: str = '='):
     keys = {}
     for line in open(file, 'r').read().split('\n'):
         if line.find(sep) >= 0:
@@ -18,7 +19,7 @@ def get_keys_from_ini_file(file, sep='='):
     return keys
 
 
-def get_key_from_ini_file(name, file, sep='='):
+def get_key_from_ini_file(name: str, file: str, sep: str = '='):
     keys = get_keys_from_ini_file(file, sep)
     return keys[name] or None
 
@@ -27,12 +28,16 @@ def get_key_from_file(file):
     return open(file, 'r').read()
 
 
-def log(msg):
-    print(msg)
+def get_config_from_json(file: str):
+    return json.load(open(file, 'r'))
+
+
+def log(*msg):
+    print(*msg)
     sys.stdout.flush()
 
 
-def check_date(date):
+def check_date(date: str):
     comp = date.split(' ')
 
     if not comp:
