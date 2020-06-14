@@ -197,6 +197,7 @@ class BattleBot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        log('Ready!')
         await self._setup(self._bot.guilds[0])
 
     @commands.Cog.listener()
