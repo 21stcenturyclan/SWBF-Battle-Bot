@@ -22,9 +22,9 @@ class BattleBot(commands.Cog):
     #
 
     async def _setup(self, guild):
-        await Context.get_or_create_role(text(MATCH_TEAM1), guild, discord.Colour(0xcc00cc))
-        await Context.get_or_create_role(text(MATCH_TEAM2), guild, discord.Colour(0x00cccc))
-        await Context.get_or_create_role(text(MATCH_COMMANDER), guild, discord.Colour(0xcccc00))
+        await Context.get_or_create_role(text(MATCH_TEAM1), guild, discord.Colour(TEAM_1_COLOR))
+        await Context.get_or_create_role(text(MATCH_TEAM2), guild, discord.Colour(TEAM_2_COLOR))
+        await Context.get_or_create_role(text(MATCH_COMMANDER), guild, discord.Colour(COMMANDER_COLOR))
 
 
     @staticmethod
@@ -32,9 +32,9 @@ class BattleBot(commands.Cog):
         log('Create roles')
         try:
             match_role = await guild.create_role(name=match.get_role_name(0), color=discord.Colour(match.get_color()))
-            team1 = await Context.get_or_create_role(text(MATCH_TEAM1), guild, discord.Colour(0xcc00cc))
-            team2 = await Context.get_or_create_role(text(MATCH_TEAM2), guild, discord.Colour(0x00cccc))
-            commander = await Context.get_or_create_role(text(MATCH_COMMANDER), guild, discord.Colour(0xcccc00))
+            team1 = await Context.get_or_create_role(text(MATCH_TEAM1), guild, discord.Colour(TEAM_1_COLOR))
+            team2 = await Context.get_or_create_role(text(MATCH_TEAM2), guild, discord.Colour(TEAM_2_COLOR))
+            commander = await Context.get_or_create_role(text(MATCH_COMMANDER), guild, discord.Colour(COMMANDER_COLOR))
 
             match.set_role(match_role)
 
