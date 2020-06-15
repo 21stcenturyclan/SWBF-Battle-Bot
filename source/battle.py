@@ -196,6 +196,7 @@ class Battle:
         self._players = set()
         self._reactions = {4: set(), 3: set(), 5: set(), 2: set()}
         self._matches = {4: {}, 3: {}, 5: {}, 2: {}}
+        self._invite_approvals = 0
 
         self._set_size(size)
 
@@ -295,6 +296,10 @@ class Battle:
         self._players.add(player)
         self._reactions[size].add(player)
 
+    def remove_player(self, player, size):
+        self._players.remove(player)
+        self._reactions[size].remove(player)
+
     def get_participant_list(self):
         playerlist = ''
         for size, players in self._reactions.items():
@@ -307,6 +312,15 @@ class Battle:
 
     def start(self):
         self._do_matchmaking()
+
+    def add_invite_approval(self):
+        self._invite_approvals += 1
+
+        if self._invite_approvals >= (self.player_count() + 1) / 2:
+            self.start()
+
+    def remove_invite_approval(self):
+        self._invite_approvals -= 1
 
     def get_invite_message(self):
         return b(text(BATTLE))
