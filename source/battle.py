@@ -316,7 +316,7 @@ class Battle:
     def add_invite_approval(self):
         self._invite_approvals += 1
 
-        if self._invite_approvals >= (self.player_count() + 1) / 2:
+        if self._invite_approvals >= int(self.player_count() / 2 + 0.5):
             self.start()
 
     def remove_invite_approval(self):

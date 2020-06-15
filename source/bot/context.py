@@ -1,6 +1,3 @@
-from discord.utils import get
-
-
 class Context:
     @staticmethod
     def get_username(ctx=None, user=None):

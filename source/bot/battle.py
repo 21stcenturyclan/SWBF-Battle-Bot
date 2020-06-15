@@ -38,13 +38,15 @@ class BattleBot(commands.Cog):
 
             log('  - assign roles')
             # Assign roles
-            await match.get_commander(1).add_roles([commander])
+            await match.get_commander(1).add_roles(commander)
             for player in match.get_team(1):
-                await player.add_roles([match_role, team1])
+                await player.add_roles(match_role)
+                await player.add_roles(team1)
 
-            await match.get_commander(2).add_roles([commander])
+            await match.get_commander(2).add_roles(commander)
             for player in match.get_team(2):
-                await player.add_roles([match_role, team2])
+                await player.add_roles(match_role)
+                await player.add_roles(team2)
 
         except Exception as e:
             log(e)
@@ -82,11 +84,11 @@ class BattleBot(commands.Cog):
             text0 = await guild.create_text_channel(text(LOBBY), category=cat)
 
             # Team 1 Channels
-            voice1 = await guild.create_voice_channel(match.get_channel_name(1), category=cat, overwrites=permission_team1)
+            voice1 = await guild.create_voice_channel(text(MATCH_TEAM1), category=cat, overwrites=permission_team1)
             #text1 = await guild.create_text_channel(match.get_channel_name(1), category=cat, overwrites=permission_team1)
 
             # Team 2 Channels
-            voice2 = await guild.create_voice_channel(match.get_channel_name(2), category=cat, overwrites=permission_team2)
+            voice2 = await guild.create_voice_channel(text(MATCH_TEAM2), category=cat, overwrites=permission_team2)
             #text2 = await guild.create_text_channel(match.get_channel_name(2), category=cat, overwrites=permission_team2)
 
             log('  - set channels')
@@ -149,6 +151,7 @@ class BattleBot(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         log('#add reaction')
+
         # Is it a reaction to the battle invitation?
         if reaction.message.id in self._battle_invites:
             battle = self._battle_invites[reaction.message.id]
@@ -206,6 +209,7 @@ class BattleBot(commands.Cog):
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         log('#remove reaction')
+
         if reaction.message.id in self._battle_invites:
             battle = self._battle_invites[reaction.message.id]
             msg = battle.get_invite_message_object()
