@@ -1,4 +1,7 @@
-class Player:
+from source.storage.models.DBEntity import DBEntity
+
+
+class DBPlayer(DBEntity):
     def __init__(self, name: str):
         super().__init__(name)
 
@@ -27,3 +30,7 @@ class Player:
     @staticmethod
     def insert(db, values: tuple):
         db.insert('Player', ['name', 'kills'], values)
+
+    @staticmethod
+    def select(db, what: str, key: str, value: str):
+        return db.select('Player', what, key, value)

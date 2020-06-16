@@ -1,24 +1,10 @@
-# from source.storage.db import DB
-# from source.storage.models.player import Player
-#
-# db = DB('test')
-# Player.create_table(db)
-# Player.insert(db, ('test', 20))
+from source.storage.db import DB
+from source.storage.models.player import DBPlayer
 
-import time
-
-from source.memory.offsets import Offsets
-from source.memory.process import Process
-from source.memory.swbf_server import SWBFServer
-
-
-process = Process('Battlefront.exe')
-offsets = Offsets('offsets.json')
-server = SWBFServer(process, offsets)
-
-
-while True:
-    server.update()
-    time.sleep(1)
-
+db = DB('test')
+# DBPlayer.create_table(db)
+# DBPlayer.insert(db, ('test', 20))
+# DBPlayer.insert(db, ('test', 40))
+# DBPlayer.insert(db, ('test', 60))
+print(DBPlayer.select(db, '*', 'name', 'test'))
 

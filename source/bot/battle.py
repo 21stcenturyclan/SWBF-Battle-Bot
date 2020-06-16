@@ -3,6 +3,7 @@ from discord.ext import commands
 
 from source.battle import Battle, Match
 from source.bot.context import Context
+from source.storage.db import DB
 from source.util.settings import *
 from source.util.util import check_date, log
 from source.util.text import *
@@ -12,6 +13,7 @@ class BattleBot(commands.Cog):
 
     def __init__(self, bot):
         self._bot = bot
+        self._db = DB('BattleBot')
         self._battle_invites = {}
         self._match_confirmations = {}
 
@@ -39,6 +41,7 @@ class BattleBot(commands.Cog):
             log('  - assign roles')
             # Assign roles
             await match.get_commander(1).add_roles(commander)
+            #TODO await match.get_commander(1).send
             for player in match.get_team(1):
                 await player.add_roles(match_role)
                 await player.add_roles(team1)
@@ -101,6 +104,9 @@ class BattleBot(commands.Cog):
     #
     # Public
     #
+
+    def exit(self):
+        pass
 
     @commands.command(name='battle',
                       aliases=['newbattle'],
@@ -191,6 +197,8 @@ class BattleBot(commands.Cog):
                 if Context.has_any_role(user=user, roles=AdministratorRoles):
                     log('  - result confirmation')
                     match = self._match_confirmations[reaction.message.id]
+
+                    match.store(self._db)
 
                     log('  - remove roles')
                     team1 = await Context.get_or_create_role(text(MATCH_TEAM1), reaction.message.guild)

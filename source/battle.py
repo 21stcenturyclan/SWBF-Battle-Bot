@@ -6,6 +6,7 @@ from time import time
 import discord
 
 from source.bot.context import Context
+from source.storage.models.player import DBPlayer
 from source.util.text import *
 from source.util.util import remove_from_list, log, get_max
 
@@ -180,6 +181,15 @@ class Match:
                             value='{0}: {1}-{2}'.format(b(result['map']), result['team-1'], result['team-2']),
                             inline=False)
         return embed
+
+    def store(self, db):
+        DBPlayer.create_table(db)
+
+        # for skirmish in self._results:
+        #
+        # team1 = []
+        # for p1 in self._team1:
+        #     team1.append()
 
 
 class Battle:

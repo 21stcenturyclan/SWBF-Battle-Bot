@@ -11,10 +11,11 @@ if __name__ == '__main__':
 
     KEY_DISCORD = get_key_from_ini_file('DISCORD', 'keys.ini')
     bot = commands.Bot(command_prefix='!')
-    BattleBot(bot)
+    bb = BattleBot(bot)
 
 
     def signal_handler(sig, frame):
+        bb.exit()
         log('Ctrl+C!')
         exit(0)
 

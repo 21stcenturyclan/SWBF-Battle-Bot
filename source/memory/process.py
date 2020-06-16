@@ -5,17 +5,19 @@ import wmi
 
 
 class Process:
-    def __init__(self, process_name):
+    def __init__(self, process_name='', pid=None):
         self._handle = None
         self._modules = []
         self._base_address = 0
+        self._pid = pid
 
-        c = wmi.WMI()
+        if not self._pid:
+            c = wmi.WMI()
 
-        for process in c.Win32_Process():
-            if process.Name == process_name:
-                self._pid = process.ProcessId
-                break
+            for process in c.Win32_Process():
+                if process.Name == process_name:
+                    self._pid = process.ProcessId
+                    break
 
         if self._pid:
             self._handle = windll.kernel32.OpenProcess(0x1F0FFF, False, self._pid)
