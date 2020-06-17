@@ -35,6 +35,6 @@ class Process:
                                                  self._base_address + offset,
                                                  byref(data), sizeof(data),
                                                  byref(read_bytes)):
-            print(GetLastError())
+            pass # print(GetLastError())
 
         return data

@@ -12,6 +12,7 @@ class SWBFServer:
         self._info = {'name': '', 'capacity': 0}
 
         self._join_callback = None
+        self._leave_callback = None
 
         self._setup()
 
@@ -34,7 +35,6 @@ class SWBFServer:
             name = self._process.read(self._name[0] + i * self._name[1], 50).value
             kills = self._process.read(self._kill[0] + i * self._kill[1], 1).value
             team = self._process.read(self._team[0] + i * self._team[0], 1).value
-            print(name, kills, team)
             if name:
                 if name not in self._online:
                     self._online[name] = {'kills': 0, 'team': 0}
@@ -44,16 +44,29 @@ class SWBFServer:
                 self._online[name]['team'] = team
 
         if self._current != self.players_online():
+
+            if self._current > self.players_online():
+                if self._join_callback:
+                    self._join_callback()
+
+            elif self._current < self.players_online():
+                if self._leave_callback:
+                    self._leave_callback()
+
             self._current = self.players_online()
-            print(self._current)
-            if self._join_callback:
-                self._join_callback()
+
 
     def on_join(self, callback):
         self._join_callback = callback
 
+    def on_leave(self, callback):
+        self._leave_callback = callback
+
     def players_online(self):
         return len(self._online)
+
+    def player_names(self):
+        return list(self._online.keys())
 
     def name(self):
         return self._info['name']
