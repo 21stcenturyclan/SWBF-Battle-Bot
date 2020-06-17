@@ -27,6 +27,9 @@ class Process:
     def __del__(self):
         win32api.CloseHandle(self._handle)
 
+    def pid(self):
+        return self._pid
+
     def read(self, offset, size=64):
         data = create_string_buffer(size)
         read_bytes = c_ulonglong()

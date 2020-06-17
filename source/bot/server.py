@@ -27,17 +27,22 @@ class ServerBot(commands.Cog):
         self._ready = False
         self._bot = bot
         self._channel = None
+        self._server_messages = {}
 
         bot.add_cog(self)
 
     def exit(self):
         pass
 
-    async def join(self):
-        await self._channel.send('join')
+    async def join(self, server):
+        pid = server.process().pid()
+        message = server.name() + ' ' + ', '.join(server.player_names)
+        await self._server_messages[pid].edit(content=message)
 
-    async def leave(self):
-        await self._channel.send('leave')
+    async def leave(self, server):
+        pid = server.process().pid()
+        message = server.name() + ' ' + ', '.join(server.player_names)
+        await self._server_messages[pid].edit(content=message)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -46,7 +51,6 @@ class ServerBot(commands.Cog):
                 self._channel = channel
                 break
         self._ready = True
-        await self._channel.send('ready')
 
         pids = []
         servers = {}
@@ -63,6 +67,9 @@ class ServerBot(commands.Cog):
             server.on_join(self.join)
             server.on_leave(self.leave)
             servers[server.get_info()['name']] = server
+
+            message = server.get_info()['name'] + ' is up!'
+            self._server_messages[pid] = await self._channel.send(message)
 
         server_thread = threading.Thread(target=update_server, args=[servers], daemon=True)
         server_thread.start()

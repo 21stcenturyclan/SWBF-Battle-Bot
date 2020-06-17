@@ -27,6 +27,9 @@ class SWBFServer:
 
         self._info = {'name': name, 'capacity': capacity}
 
+    def process(self):
+        return self._process
+
     def get_info(self):
         return self._info
 
@@ -47,11 +50,11 @@ class SWBFServer:
 
             if self._current > self.players_online():
                 if self._join_callback:
-                    self._join_callback()
+                    self._join_callback(self)
 
             elif self._current < self.players_online():
                 if self._leave_callback:
-                    self._leave_callback()
+                    self._leave_callback(self)
 
             self._current = self.players_online()
 
