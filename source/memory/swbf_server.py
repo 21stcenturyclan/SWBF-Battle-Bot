@@ -46,18 +46,27 @@ class SWBFServer:
                 self._online[name]['kills'] = kills
                 self._online[name]['team'] = team
 
+        # if self._current != self.players_online():
+        #
+        #     if self._current > self.players_online():
+        #         if self._join_callback:
+        #             self._join_callback(self)
+        #
+        #     elif self._current < self.players_online():
+        #         if self._leave_callback:
+        #             self._leave_callback(self)
+        #
+        #     self._current = self.players_online()
+
+    def has_changed(self):
+        changed = False
         if self._current != self.players_online():
+            changed = True
 
-            if self._current > self.players_online():
-                if self._join_callback:
-                    self._join_callback(self)
-
-            elif self._current < self.players_online():
-                if self._leave_callback:
-                    self._leave_callback(self)
-
+        if changed:
             self._current = self.players_online()
 
+        return changed
 
     def on_join(self, callback):
         self._join_callback = callback
@@ -69,7 +78,7 @@ class SWBFServer:
         return len(self._online)
 
     def player_names(self):
-        return list(self._online.keys())
+        return [x.decode('utf-8') for x in list(self._online.keys())]
 
     def name(self):
         return self._info['name']

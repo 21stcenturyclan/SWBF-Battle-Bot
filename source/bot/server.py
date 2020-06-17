@@ -13,15 +13,6 @@ from source.memory.process import Process
 from source.memory.swbf_server import SWBFServer
 
 
-def update_server(servers):
-    while True:
-        for name, server in servers.items():
-            server.update()
-            #print(server.player_names())
-            sys.stdout.flush()
-        time.sleep(10)
-
-
 class ServerBot(commands.Cog):
 
     def __init__(self, bot):
@@ -29,26 +20,23 @@ class ServerBot(commands.Cog):
         self._bot = bot
         self._channel = None
         self._server_messages = {}
+        self._servers = {}
 
         bot.add_cog(self)
 
     def exit(self):
         pass
 
-    def join(self, server):
-        pid = server.process().pid()
-        message = server.name() + ' ' + ', '.join(server.player_names)
+    async def update_servers(self):
+        while True:
+            for name, server in self._servers.items():
+                server.update()
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._server_messages[pid].edit(content=message))
-
-
-    def leave(self, server):
-        pid = server.process().pid()
-        message = server.name() + ' ' + ', '.join(server.player_names)
-
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self._server_messages[pid].edit(content=message))
+                if server.has_changed():
+                    message = server.name() + ': ' + ', '.join(server.player_names())
+                    pid = server.process().pid()
+                    await self._server_messages[pid].edit(content=message)
+            time.sleep(10)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -59,7 +47,6 @@ class ServerBot(commands.Cog):
         self._ready = True
 
         pids = []
-        servers = {}
         pythoncom.CoInitialize()
         c = wmi.WMI()
         offsets = Offsets('offsets.json')
@@ -70,12 +57,10 @@ class ServerBot(commands.Cog):
         for pid in pids:
             process = Process(pid=pid)
             server = SWBFServer(process, offsets)
-            server.on_join(self.join)
-            server.on_leave(self.leave)
-            servers[server.get_info()['name']] = server
+            self._servers[server.name()] = server
 
-            message = server.get_info()['name'] + ' is up!'
+            message = server.name() + ' is up: ' + ', '.join(server.player_names())
             self._server_messages[pid] = await self._channel.send(message)
 
-        server_thread = threading.Thread(target=update_server, args=[servers], daemon=True)
-        server_thread.start()
+
+        self._bot.loop.create_task(self.update_servers())
