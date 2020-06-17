@@ -8,6 +8,7 @@ class SWBFServer:
         self._kill = self._offsets['PLAYER_KILL']
         self._team = self._offsets['PLAYER_TEAM']
         self._online = {}
+        self._online_num = 0
         self._current = 0
         self._info = {'name': '', 'capacity': 0}
 
@@ -34,11 +35,13 @@ class SWBFServer:
         return self._info
 
     def update(self):
+        self._online_num = 0
         for i in range(self._info['capacity']):
             name = self._process.read(self._name[0] + i * self._name[1], 50).value
             kills = self._process.read(self._kill[0] + i * self._kill[1], 1).value
             team = self._process.read(self._team[0] + i * self._team[0], 1).value
             if name:
+                self._online_num += 1
                 if name not in self._online:
                     self._online[name] = {'kills': 0, 'team': 0}
                 kills = self._process.read(self._kill[0] + i * self._kill[1], 1).value
@@ -60,11 +63,11 @@ class SWBFServer:
 
     def has_changed(self):
         changed = False
-        if self._current != self.players_online():
+        if self._current != self._online_num:
             changed = True
 
         if changed:
-            self._current = self.players_online()
+            self._current = self._online_num
 
         return changed
 
@@ -75,7 +78,7 @@ class SWBFServer:
         self._leave_callback = callback
 
     def players_online(self):
-        return len(self._online)
+        return self._online_num
 
     def player_names(self):
         return [x.decode('utf-8') for x in list(self._online.keys())]
