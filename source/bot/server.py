@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import time
 
@@ -16,7 +17,7 @@ def update_server(servers):
     while True:
         for name, server in servers.items():
             server.update()
-            print(server.player_names())
+            #print(server.player_names())
             sys.stdout.flush()
         time.sleep(10)
 
@@ -34,15 +35,20 @@ class ServerBot(commands.Cog):
     def exit(self):
         pass
 
-    async def join(self, server):
+    def join(self, server):
         pid = server.process().pid()
         message = server.name() + ' ' + ', '.join(server.player_names)
-        await self._server_messages[pid].edit(content=message)
 
-    async def leave(self, server):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self._server_messages[pid].edit(content=message))
+
+
+    def leave(self, server):
         pid = server.process().pid()
         message = server.name() + ' ' + ', '.join(server.player_names)
-        await self._server_messages[pid].edit(content=message)
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self._server_messages[pid].edit(content=message))
 
     @commands.Cog.listener()
     async def on_ready(self):
