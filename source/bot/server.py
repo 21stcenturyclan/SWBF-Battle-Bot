@@ -1,10 +1,7 @@
-import asyncio
-import sys
 import time
 
 import pythoncom
 import wmi
-import threading
 
 from discord.ext import commands
 
@@ -16,6 +13,7 @@ from source.memory.swbf_server import SWBFServer
 class ServerBot(commands.Cog):
 
     def __init__(self, bot):
+        self._is_init = False
         self._ready = False
         self._bot = bot
         self._channel = None
@@ -32,11 +30,15 @@ class ServerBot(commands.Cog):
             for name, server in self._servers.items():
                 server.update()
 
-                if server.has_changed():
-                    message = server.name() + ': ' + ', '.join(server.player_names())
-                    pid = server.process().pid()
-                    await self._server_messages[pid].edit(content=message)
-            time.sleep(10)
+                message = '{} [{}/{}] {}'.format(
+                    server.name(),
+                    server.players_online(),
+                    server.slots(),
+                    ', '.join(server.player_names()))
+
+                pid = server.process().pid()
+                await self._server_messages[pid].edit(content=message)
+            time.sleep(15)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -46,21 +48,27 @@ class ServerBot(commands.Cog):
                 break
         self._ready = True
 
-        pids = []
-        pythoncom.CoInitialize()
-        c = wmi.WMI()
-        offsets = Offsets('offsets.json')
-        for process in c.Win32_Process():
-            if process.Name == 'Battlefront.exe':
-                pids.append(process.ProcessId)
+        if not self._is_init:
+            pids = []
+            pythoncom.CoInitialize()
+            c = wmi.WMI()
+            offsets = Offsets('offsets.json')
+            for process in c.Win32_Process():
+                if process.Name == 'Battlefront.exe':
+                    pids.append(process.ProcessId)
 
-        for pid in pids:
-            process = Process(pid=pid)
-            server = SWBFServer(process, offsets)
-            self._servers[server.name()] = server
+            for pid in pids:
+                process = Process(pid=pid)
+                server = SWBFServer(process, offsets)
+                self._servers[server.name()] = server
 
-            message = server.name() + ' is up: ' + ', '.join(server.player_names())
-            self._server_messages[pid] = await self._channel.send(message)
+                message = '{} [{}/{}] {}'.format(
+                    server.name(),
+                    server.players_online(),
+                    server.slots(),
+                    ', '.join(server.player_names()))
 
+                self._server_messages[pid] = await self._channel.send(message)
 
-        self._bot.loop.create_task(self.update_servers())
+            self._is_init = True
+            self._bot.loop.create_task(self.update_servers())

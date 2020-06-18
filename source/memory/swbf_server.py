@@ -43,8 +43,8 @@ class SWBFServer:
                     self._online[name] = {'kills': 0, 'team': 0}
                 kills = self._process.read(self._kill[0] + i * self._kill[1], 1).value
                 team = self._process.read(self._team[0] + i * self._team[0], 1).value
-                self._online[name]['kills'] = kills[0]
-                self._online[name]['team'] = team[0]
+                self._online[name]['kills'] = kills
+                self._online[name]['team'] = team
 
         # if self._current != self.players_online():
         #
