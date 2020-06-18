@@ -37,8 +37,7 @@ class ServerBot(commands.Cog):
                     ', '.join(server.player_names()))
 
                 pid = server.process().pid()
-                new_message = await self._server_messages[pid].edit(content=message)
-                self._server_messages[pid] = new_message
+                await self._server_messages[pid].edit(content=message)
             time.sleep(15)
 
     @commands.Cog.listener()
