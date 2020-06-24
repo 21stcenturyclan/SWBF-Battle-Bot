@@ -45,6 +45,18 @@ class DB:
         except Exception as e:
             print(e)
 
+    def update(self, table: str, keys: list, values: tuple, key: str, value: str):
+        new_values = ','.join(['{0} = {1}'.format(str(k), str(v)) for k,v in zip(keys, values)])
+
+        self._statement = 'UPDATE {0} SET {1} WHERE {2} = {3};'.format(
+            table, new_values, key, value)
+
+        try:
+            self._connection.cursor().execute(self._statement)
+            self._connection.commit()
+        except Exception as e:
+            print(e)
+
     def select(self, table: str, what: str, key: str, value: str):
         self._statement = 'SELECT {0} FROM {1} WHERE {2}="{3}";'.format(
             what, table, key, value)

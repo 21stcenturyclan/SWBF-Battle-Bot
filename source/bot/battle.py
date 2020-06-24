@@ -87,11 +87,13 @@ class BattleBot(commands.Cog):
             text0 = await guild.create_text_channel(text(LOBBY), category=cat)
 
             # Team 1 Channels
-            voice1 = await guild.create_voice_channel(text(MATCH_TEAM1), category=cat, overwrites=permission_team1)
+            t1_name = text(MATCH_TEAM1) + ' (REB/CIS)'
+            voice1 = await guild.create_voice_channel(t1_name, category=cat, overwrites=permission_team1)
             #text1 = await guild.create_text_channel(match.get_channel_name(1), category=cat, overwrites=permission_team1)
 
             # Team 2 Channels
-            voice2 = await guild.create_voice_channel(text(MATCH_TEAM2), category=cat, overwrites=permission_team2)
+            t2_name = text(MATCH_TEAM2) + ' (EMP/REP)'
+            voice2 = await guild.create_voice_channel(t2_name, category=cat, overwrites=permission_team2)
             #text2 = await guild.create_text_channel(match.get_channel_name(2), category=cat, overwrites=permission_team2)
 
             log('  - set channels')

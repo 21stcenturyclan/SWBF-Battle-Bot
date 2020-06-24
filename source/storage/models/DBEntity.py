@@ -4,7 +4,7 @@ class DBEntity:
         raise NotImplemented
 
     @staticmethod
-    def insert(db, values: tuple):
+    def insert(db, keys: list, values: tuple):
         raise NotImplemented
 
     @staticmethod

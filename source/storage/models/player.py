@@ -2,6 +2,8 @@ from source.storage.models.DBEntity import DBEntity
 
 
 class DBPlayer(DBEntity):
+    TABLE = 'Player'
+
     def __init__(self, name: str):
         super().__init__(name)
 
@@ -20,17 +22,28 @@ class DBPlayer(DBEntity):
     @staticmethod
     def create_table(db):
         db.create_table(
-            'Player',
+            DBPlayer.TABLE,
             [
                 ['id', 'INTEGER', 'PRIMARY KEY'],
                 ['name', 'TEXT', 'NOT NULL'],
-                ['kills', 'INTEGER']
+                ['nick', 'TEXT', 'NOT NULL'],
+                ['kills', 'INTEGER'],
+                ['deaths', 'INTEGER'],
+                ['cp', 'INTEGER'],
+                ['kd', 'FLOAT'],
+                ['tickets', 'INTEGER'],
+                ['battles', 'INTEGER'],
+                ['matches', 'INTEGER'],
             ])
 
     @staticmethod
-    def insert(db, values: tuple):
-        db.insert('Player', ['name', 'kills'], values)
+    def insert(db, keys: list, values: tuple):
+        db.insert(DBPlayer.TABLE, keys, values)
+
+    @staticmethod
+    def update(db, keys: list, values: tuple, key: str, value: str):
+        db.update(DBPlayer.TABLE, keys, values, key, value)
 
     @staticmethod
     def select(db, what: str, key: str, value: str):
-        return db.select('Player', what, key, value)
+        return db.select(DBPlayer.TABLE, what, key, value)
