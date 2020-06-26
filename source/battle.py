@@ -61,6 +61,9 @@ class Match:
     def get_match_id(self):
         return self._match_id
 
+    def get_size(self):
+        return self._size
+
     def get_color(self):
         return int(self._match_id, 16)
 

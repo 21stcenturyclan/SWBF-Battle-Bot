@@ -57,6 +57,22 @@ class DB:
         except Exception as e:
             print(e)
 
+    def insert_or_update(self, table: str, keys: list, values: tuple, key: str, value: str):
+        self._statement = 'SELECT EXISTS(SELECT * FROM {0} WHERE {1}={2});'.format(
+            table, key, value)
+
+        try:
+            self._connection.cursor().execute(self._statement)
+            result = self._connection.cursor().fetchall()
+
+            if not result:
+                self.insert(table, keys, values)
+            else:
+                self.update(table, keys, values, key, value)
+
+        except Exception as e:
+            print(e)
+
     def select(self, table: str, what: str, key: str, value: str):
         self._statement = 'SELECT {0} FROM {1} WHERE {2}="{3}";'.format(
             what, table, key, value)
