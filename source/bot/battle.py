@@ -4,6 +4,7 @@ from discord.ext import commands
 from source.battle import Battle, Match
 from source.bot.context import Context
 from source.storage.db import DB
+from source.storage.models.player import DBPlayer
 from source.util.settings import *
 from source.util.util import check_date, log
 from source.util.text import *
@@ -13,7 +14,7 @@ class BattleBot(commands.Cog):
 
     def __init__(self, bot):
         self._bot = bot
-        self._db = DB('BattleBot')
+        self._db = None
         self._battle_invites = {}
         self._match_confirmations = {}
 
@@ -24,6 +25,9 @@ class BattleBot(commands.Cog):
     #
 
     async def _setup(self, guild):
+        self._db = DB('BattleBot')
+        DBPlayer.create_table(self._db)
+
         await Context.get_or_create_role(text(MATCH_TEAM1), guild, discord.Colour(TEAM_1_COLOR))
         await Context.get_or_create_role(text(MATCH_TEAM2), guild, discord.Colour(TEAM_2_COLOR))
         await Context.get_or_create_role(text(MATCH_COMMANDER), guild, discord.Colour(COMMANDER_COLOR))
@@ -38,18 +42,24 @@ class BattleBot(commands.Cog):
 
             match.set_role(match_role)
 
+            size = match.get_size()
+            mid = match.get_match_id()
+
             log('  - assign roles')
             # Assign roles
             await match.get_commander(1).add_roles(commander)
-            #TODO await match.get_commander(1).send
+            await match.get_commander(1).send(text(MATCH_COMMANDER_RESPONSIBLE))
             for player in match.get_team(1):
                 await player.add_roles(match_role)
                 await player.add_roles(team1)
+                await player.send(text(PLAYER_TEAM_NOTICE).format(size, mid, 1, 'REB/CIS'))
 
             await match.get_commander(2).add_roles(commander)
+            await match.get_commander(2).send(text(MATCH_COMMANDER_RESPONSIBLE))
             for player in match.get_team(2):
                 await player.add_roles(match_role)
                 await player.add_roles(team2)
+                await player.send(text(PLAYER_TEAM_NOTICE).format(size, mid, 2, 'EMP/REP'))
 
         except Exception as e:
             log(e)
@@ -155,6 +165,77 @@ class BattleBot(commands.Cog):
                     log('  - send result')
                     msg = await ctx.send(match.get_result_message(), embed=match.get_result_embed())
                     self._match_confirmations[msg.id] = match
+
+    @commands.command(name='leaderboard',
+                      aliases=['update'],
+                      help='bla')
+    @commands.has_any_role(*AdministratorRoles)
+    async def leaderboard(self, ctx):
+        log('!leaderboard')
+
+        if len(ctx.message.attachments) > 0:
+            content = await ctx.message.attachments[0].read()
+            content = content.decode("UTF-8").split('\n')
+
+            try:
+                i = 0
+                for line in content:
+                    nick, kills, deaths, cp, w, d, l, p = line.split(' ')
+
+                    result = self._db.select(
+                        'Player',
+                        'kills, deaths, cp, wins, draws, losses',
+                        'nick',
+                        nick)
+
+                    if not result:
+                        result = (0, 0, 0, 0, 0, 0, 40)
+
+                    self._db.insert_or_update(
+                        'Player',
+                        ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
+                        (nick,
+                         result[0] + int(kills),
+                         result[1] + int(deaths),
+                         result[2] + int(cp),
+                         result[3] + int(w),
+                         result[4] + int(d),
+                         result[5] + int(l),
+                         result[6] + float(p)),
+                        'nick',
+                        nick)
+
+                    i += 1
+
+                log('All good updated {} entries!'.format(i))
+
+            except Exception as e:
+                log(e)
+
+    @commands.command(name='stats',
+                      aliases=['statistics'],
+                      help='bla')
+    @commands.has_any_role(*ParticipantRoles)
+    async def stats(self, ctx, name: str):
+        log('!stats')
+
+        result = self._db.select(
+            'Player',
+            ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
+            'nick',
+            name)[0]
+
+        message = str('**Stats for {0}**:\n'
+                      ' - Kills: {1}\n'
+                      ' - Deaths: {2}\n'
+                      ' - CP\'s: {3}\n'
+                      ' - Wins: {4}\n'
+                      ' - Draws: {5}\n'
+                      ' - Losses: {6}\n'
+                      ' - Points: {7}').format(
+            result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7])
+
+        await ctx.send(message)
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
