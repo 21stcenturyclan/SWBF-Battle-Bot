@@ -9,7 +9,7 @@ from source.util.util import log, get_key_from_ini_file
 
 if __name__ == '__main__':
 
-    KEY_DISCORD = get_key_from_ini_file('DISCORD_TEST', 'keys.ini')
+    KEY_DISCORD = get_key_from_ini_file('DISCORD', 'keys.ini')
     bot = commands.Bot(command_prefix='!')
     bb = BattleBot(bot)
 
