@@ -206,7 +206,7 @@ class BattleBot(commands.Cog):
                     team1 = await Context.get_or_create_role(text(MATCH_TEAM1), reaction.message.guild)
                     team2 = await Context.get_or_create_role(text(MATCH_TEAM2), reaction.message.guild)
                     for player in match.get_players():
-                        player.remove_roles([team1, team2])
+                        await player.remove_roles([team1, team2])
 
                     log('  - delete role')
                     await match.get_role().delete()
