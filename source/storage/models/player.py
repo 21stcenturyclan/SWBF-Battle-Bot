@@ -33,6 +33,7 @@ class DBPlayer(DBEntity):
                 ['kd', 'FLOAT'],
                 ['wins', 'INTEGER'],
                 ['draws', 'INTEGER'],
+                ['points', 'FLOAT'],
                 ['losses', 'INTEGER'],
                 ['tickets', 'INTEGER'],
                 ['battles', 'INTEGER'],

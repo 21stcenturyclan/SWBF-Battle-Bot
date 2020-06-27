@@ -14,19 +14,20 @@ class BattleBot(commands.Cog):
 
     def __init__(self, bot):
         self._bot = bot
-        self._db = DB('BattleBot')
+        self._db = None
         self._battle_invites = {}
         self._match_confirmations = {}
 
         bot.add_cog(self)
-
-        DBPlayer.create_table(self._db)
 
     #
     # Private
     #
 
     async def _setup(self, guild):
+        self._db = DB('BattleBot')
+        DBPlayer.create_table(self._db)
+
         await Context.get_or_create_role(text(MATCH_TEAM1), guild, discord.Colour(TEAM_1_COLOR))
         await Context.get_or_create_role(text(MATCH_TEAM2), guild, discord.Colour(TEAM_2_COLOR))
         await Context.get_or_create_role(text(MATCH_COMMANDER), guild, discord.Colour(COMMANDER_COLOR))
@@ -174,7 +175,7 @@ class BattleBot(commands.Cog):
 
         if len(ctx.message.attachments) > 0:
             content = await ctx.message.attachments[0].read()
-            content = content.decode("UTF-8")
+            content = content.decode("UTF-8").split('\n')
 
             try:
                 i = 0
@@ -192,14 +193,15 @@ class BattleBot(commands.Cog):
 
                     self._db.insert_or_update(
                         'Player',
-                        ['kills', 'deaths', 'cp', 'wins', 'draws', 'losses'],
-                        (result[0] + kills,
-                         result[1] + deaths,
-                         result[2] + cp,
-                         result[3] + w,
-                         result[4] + d,
-                         result[5] + l,
-                         result[6] + p),
+                        ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
+                        (nick,
+                         result[0] + int(kills),
+                         result[1] + int(deaths),
+                         result[2] + int(cp),
+                         result[3] + int(w),
+                         result[4] + int(d),
+                         result[5] + int(l),
+                         result[6] + float(p)),
                         'nick',
                         nick)
 
@@ -217,8 +219,23 @@ class BattleBot(commands.Cog):
     async def stats(self, ctx, name: str):
         log('!stats')
 
-        result = self._db.select('Player', '*', 'nick', name)
-        await ctx.send(result)
+        result = self._db.select(
+            'Player',
+            ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
+            'nick',
+            name)[0]
+
+        message = str('**Stats for {0}**:\n'
+                      ' - Kills: {1}\n'
+                      ' - Deaths: {2}\n'
+                      ' - CP\'s: {3}\n'
+                      ' - Wins: {4}\n'
+                      ' - Draws: {5}\n'
+                      ' - Losses: {6}\n'
+                      ' - Points: {7}').format(
+            result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7])
+
+        await ctx.send(message)
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
