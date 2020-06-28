@@ -186,28 +186,32 @@ class BattleBot(commands.Cog):
                         'Player',
                         ['kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
                         'nick',
-                        nick)[0]
+                        nick)
 
                     if not result:
-                        result = (0, 0, 0, 0, 0, 0, 40)
+                        self._db.insert(
+                            'Player',
+                            ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
+                            (nick, 0, 0, 0, 0, 0, 0, 40))
+                    else:
+                        result = result[0]
 
-                    self._db.insert_or_update(
-                        'Player',
-                        ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
-                        ('"{}"'.format(nick),
-                         result[0] + int(kills),
-                         result[1] + int(deaths),
-                         result[2] + int(cp),
-                         result[3] + int(w),
-                         result[4] + int(d),
-                         result[5] + int(l),
-                         result[6] + float(p)),
-                        'nick',
-                        nick)
+                        self._db.update(
+                            'Player',
+                            ['kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
+                            (result[0] + int(kills),
+                             result[1] + int(deaths),
+                             result[2] + int(cp),
+                             result[3] + int(w),
+                             result[4] + int(d),
+                             result[5] + int(l),
+                             result[6] + float(p)),
+                            'nick',
+                            nick)
 
                     i += 1
 
-                log('All good updated {} entries!'.format(i))
+                log('Updated {} entries!'.format(i))
 
             except Exception as e:
                 log(e)

@@ -53,8 +53,6 @@ class DB:
         self._statement = 'UPDATE {0} SET {1} WHERE {2} = "{3}";'.format(
             table, new_values, key, value)
 
-        self._print_statement()
-
         try:
             self._connection.cursor().execute(self._statement)
             self._connection.commit()
@@ -63,7 +61,7 @@ class DB:
 
     def insert_or_update(self, table: str, keys: list, values: tuple, key: str, value: str):
         try:
-            result = self.select(table, keys, key, value)[0]
+            result = self.select(table, keys, key, value)
 
             if not result:
                 self.insert(table, keys, values)
