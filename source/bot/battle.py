@@ -184,9 +184,9 @@ class BattleBot(commands.Cog):
 
                     result = self._db.select(
                         'Player',
-                        'kills, deaths, cp, wins, draws, losses',
+                        ['kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
                         'nick',
-                        nick)
+                        nick)[0]
 
                     if not result:
                         result = (0, 0, 0, 0, 0, 0, 40)
@@ -194,7 +194,7 @@ class BattleBot(commands.Cog):
                     self._db.insert_or_update(
                         'Player',
                         ['nick', 'kills', 'deaths', 'cp', 'wins', 'draws', 'losses', 'points'],
-                        (nick,
+                        ('"{}"'.format(nick),
                          result[0] + int(kills),
                          result[1] + int(deaths),
                          result[2] + int(cp),

@@ -1,5 +1,7 @@
 import sqlite3
 
+from source.util.util import log
+
 
 class DB:
     def __init__(self, db_file: str):
@@ -11,7 +13,7 @@ class DB:
         try:
             self._connection = sqlite3.connect(db_file)
         except Exception as e:
-            print(e)
+            log('init: {}'.format(e))
 
     def _print_statement(self):
         print(self._statement)
@@ -24,7 +26,7 @@ class DB:
             self._connection.cursor().execute(self._statement)
             self._connection.commit()
         except Exception as e:
-            print(e)
+            log('create_table: {}\n {}'.format(e, self._statement))
 
     def drop_table(self, name: str):
         self._statement = 'DROP TABLE {0};'.format(name)
@@ -33,7 +35,7 @@ class DB:
             self._connection.cursor().execute(self._statement)
             self._connection.commit()
         except Exception as e:
-            print(e)
+            log('drop_table: {}\n {}'.format(e, self._statement))
 
     def insert(self, table: str, keys: list, values: tuple):
         self._statement = 'INSERT INTO {0} ({1}) VALUES {2};'.format(
@@ -43,7 +45,7 @@ class DB:
             self._connection.cursor().execute(self._statement)
             self._connection.commit()
         except Exception as e:
-            print('insert: ' + str(e))
+            log('insert: {}\n {}'.format(e, self._statement))
 
     def update(self, table: str, keys: list, values: tuple, key: str, value: str):
         new_values = ','.join(['{0} = {1}'.format(str(k), str(v)) for k,v in zip(keys, values)])
@@ -51,19 +53,17 @@ class DB:
         self._statement = 'UPDATE {0} SET {1} WHERE {2} = "{3}";'.format(
             table, new_values, key, value)
 
+        self._print_statement()
+
         try:
             self._connection.cursor().execute(self._statement)
             self._connection.commit()
         except Exception as e:
-            print('update: ' + str(e))
+            log('update: {}\n {}'.format(e, self._statement))
 
     def insert_or_update(self, table: str, keys: list, values: tuple, key: str, value: str):
-        self._statement = 'SELECT EXISTS(SELECT * FROM {0} WHERE {1} = "{2}");'.format(
-            table, key, value)
-
         try:
-            self._connection.cursor().execute(self._statement)
-            result = self._connection.cursor().fetchall()
+            result = self.select(table, keys, key, value)[0]
 
             if not result:
                 self.insert(table, keys, values)
@@ -71,7 +71,7 @@ class DB:
                 self.update(table, keys, values, key, value)
 
         except Exception as e:
-            print('insert_or_update: ' + str(e))
+            log('insert_or_update: {}\n {}'.format(e, self._statement))
 
     def select(self, table: str, what: list, key: str, value: str):
         self._statement = 'SELECT {0} FROM {1} WHERE {2}="{3}";'.format(
@@ -80,7 +80,7 @@ class DB:
         try:
             return self._connection.cursor().execute(self._statement).fetchall()
         except Exception as e:
-            print('select: ' + str(e))
+            log('select: {}\n {}'.format(e, self._statement))
 
     def setup(self):
         pass
